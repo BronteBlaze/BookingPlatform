@@ -1,0 +1,42 @@
+body {
+  background-color: rgb(245 208 254);
+}
+
+input::placeholder {
+  color: white;
+}
+
+input:focus {
+  outline: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.video_container {
+  height: 60vh;
+  width: 100%;
+}
+
+.ReactCollapse--collapse {
+  transition: height 500ms;
+}
+
+.slick-dots li button {
+  pointer-events: none;
+}
+
+@media (min-width: 320px) and (max-width: 768px) {
+  .video_container {
+    height: 100vh;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .video_container {
+    height: 50vh;
+  }
+}
