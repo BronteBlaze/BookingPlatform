@@ -1,20 +1,15 @@
-import SignInPage from "./pages/SignInPage";
 import "./App.css";
-// import { jwtDecode } from "jwt-decode";
-// import SignUpPage from "./pages/SignUpPage";
-// import UserProfilePage from "./pages/UserProfilePage";
-// import MainPage from "./pages/MainPage";
-// import ShopPage from "./pages/ShopPage";
-// import BookingPage from "./pages/BookingPage";
-// import MoreGamesPage from "./pages/MoreGamesPage";
 import React, { Fragment, Suspense, lazy, useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router";
 import { useSelector } from "react-redux";
-// import AdminPage from "./pages/AdminPage";
 import { Spin } from "antd";
 import { jwtDecode } from "jwt-decode";
 import AllUsers from "./layouts/Admin/AllUsers";
 import AllBookings from "./layouts/Admin/AllBookings";
+import AllInventory from "./layouts/Admin/AllInventory";
+import BillingPage from "./layouts/Admin/BillingPage";
+import Chats from "./layouts/Admin/Chats";
+import socket from "./socket/socket";
 
 const LazySignInPage = lazy(() => wait(import("./pages/SignInPage")));
 const LazySignUpPage = lazy(() => wait(import("./pages/SignUpPage")));
@@ -24,12 +19,20 @@ const LazyShopPage = lazy(() => wait(import("./pages/ShopPage")));
 const LazyBookingPage = lazy(() => wait(import("./pages/BookingPage")));
 const LazyMoreGamesPage = lazy(() => wait(import("./pages/MoreGamesPage")));
 const LazyAdminPage = lazy(() => wait(import("./pages/AdminPage")));
+const LazyChattingPage = lazy(() => wait(import("./pages/ChattingPage")));
 
 const App = () => {
   const isLoggedIn = useSelector((state) => state.User.isLoggedIn);
   const tokenExist = localStorage.getItem("token");
 
+  let [isInitial, setInitial] = useState(true);
+
   const [path, setPath] = useState("/nothing");
+
+  const [messages, setMessages] = useState({
+    userId: "",
+    userMessages: [{ socketId: "", message: "" }],
+  });
 
   useEffect(() => {
     if (isLoggedIn && tokenExist) {
@@ -41,6 +44,42 @@ const App = () => {
       }
     }
   }, [isLoggedIn, tokenExist]);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      socket.connect();
+    }
+
+    return () => socket.disconnect();
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    socket.on("receiveMessage", (messageReceived, userId, socketId) => {
+      setMessages((prevMessages) => {
+        if (!isInitial) {
+          return {
+            userId: userId,
+            userMessages: [
+              ...prevMessages.userMessages,
+              { socketId: socketId, message: messageReceived },
+            ],
+          };
+        } else {
+          setInitial(false);
+          return {
+            userId: userId,
+            userMessages: [{ socketId: socketId, message: messageReceived }],
+          };
+        }
+      });
+    });
+
+    return () => {
+      socket.off("receiveMessage");
+    };
+  }, [isInitial]);
+
+  // console.log(isInitial);
 
   return (
     <Fragment>
@@ -72,12 +111,30 @@ const App = () => {
           {isLoggedIn && (
             <Route path="/games" element={<LazyMoreGamesPage />}></Route>
           )}
+          {isLoggedIn && (
+            <Route
+              path="/chats"
+              element={<LazyChattingPage messages={messages} />}
+            ></Route>
+          )}
           {isLoggedIn &&
             tokenExist &&
             jwtDecode(tokenExist).role === "superadmin" && (
-              <Route path="/admin" element={<LazyAdminPage />}>
+              <Route
+                path="/admin"
+                element={
+                  <LazyAdminPage
+                    messages={messages}
+                    setMessages={setMessages}
+                    setInitial={setInitial}
+                  />
+                }
+              >
                 <Route path="users" element={<AllUsers />} />
                 <Route path="bookings" element={<AllBookings />} />
+                <Route path="inventory" element={<AllInventory />} />
+                <Route path="billing" element={<BillingPage />} />
+                <Route path="chats" element={<Chats />} />
               </Route>
             )}
 

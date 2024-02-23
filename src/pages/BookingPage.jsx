@@ -1,4 +1,4 @@
-import { Fragment, useEffect } from "react";
+import { Fragment } from "react";
 import NavBar from "../layouts/NavBar";
 import Booking from "../layouts/Booking";
 import MobileNavbar from "../layouts/MobileNavbar";

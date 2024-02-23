@@ -16,6 +16,7 @@ import {
   setBookingError,
   setBookingSuccess,
 } from "../redux/BookingSlice";
+import { Link } from "react-router-dom";
 
 let isInitial = true;
 
@@ -74,6 +75,16 @@ const Booking = () => {
 
   return (
     <>
+      <div className="text-right xl:px-40 md:px-20 px-8 mt-4">
+        <Link to="/chats">
+          <button
+            type="button"
+            className="bg-fuchsia-500 px-4 py-1 text-white hover:bg-fuchsia-400"
+          >
+            Chat with Admin
+          </button>
+        </Link>
+      </div>
       <ConfigProvider
         theme={{
           components: {

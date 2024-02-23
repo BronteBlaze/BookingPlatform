@@ -6,6 +6,11 @@ input::placeholder {
   color: white;
 }
 
+#message::placeholder {
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 15px;
+}
+
 input:focus {
   outline: none;
 }

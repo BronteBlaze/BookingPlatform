@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import {
+  createBill,
   getAdminStatus,
-  getAllUsers,
   obtainAllBookings,
 } from "../../redux/AdminSlice";
 import { FaBars } from "react-icons/fa";
@@ -9,9 +9,12 @@ import { getAllBookings } from "../../redux/AdminSlice";
 import { useEffect, useState } from "react";
 import { Spin } from "antd";
 import Pagination from "./Pagination";
+import { addSnacks } from "../../redux/AdminSlice";
+import { useNavigate } from "react-router";
 
 const AllBookings = ({ setShowNav }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const adminStatus = useSelector(getAdminStatus);
   const { bookings, totalPages } = useSelector(getAllBookings);
@@ -19,6 +22,20 @@ const AllBookings = ({ setShowNav }) => {
   useEffect(() => {
     dispatch(obtainAllBookings(currentPage));
   }, [dispatch, currentPage]);
+
+  const addSnacksHandler = (bookingId) => {
+    dispatch(addSnacks({ bookingId, addSnack: true }));
+    navigate("/admin/inventory");
+  };
+
+  const createBillHandler = (billInfo) => {
+    dispatch(createBill(billInfo));
+    navigate("/admin/billing");
+  };
+
+  useEffect(() => {
+    dispatch(addSnacks({ bookingId: "", addSnack: false }));
+  }, [dispatch]);
 
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-4">
@@ -116,7 +133,7 @@ const AllBookings = ({ setShowNav }) => {
                     bookings.length !== 0 &&
                     bookings.map((eachBooking, index) => {
                       let {
-                        user: { userId, userName, email },
+                        user: { userName, email, firstName, lastName },
                         booking: {
                           bookPrice,
                           bookingId,
@@ -127,6 +144,19 @@ const AllBookings = ({ setShowNav }) => {
                           endTime,
                         },
                       } = eachBooking;
+                      let billInfo = {
+                        userName,
+                        email,
+                        firstName,
+                        lastName,
+                        dateOfBooking,
+                        bookingId,
+                        device,
+                        duration,
+                        startTime,
+                        endTime,
+                        bookPrice,
+                      };
                       return (
                         <tr key={index}>
                           <td className="whitespace-nowrap px-4 py-4">
@@ -165,7 +195,10 @@ const AllBookings = ({ setShowNav }) => {
                           <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-700">
                             {bookPrice}
                           </td>
-                          <td className="whitespace-nowrap px-4 py-4 text-sm text-gray-700">
+                          <td
+                            className="whitespace-nowrap px-4 py-4 text-sm text-gray-700"
+                            onClick={() => addSnacksHandler(bookingId)}
+                          >
                             <button
                               type="button"
                               className="px-8 py-2 bg-fuchsia-300 hover:bg-fuchsia-400"
@@ -177,6 +210,7 @@ const AllBookings = ({ setShowNav }) => {
                             <button
                               type="button"
                               className="px-8 py-2 bg-fuchsia-300 hover:bg-fuchsia-400"
+                              onClick={() => createBillHandler(billInfo)}
                             >
                               Bill
                             </button>

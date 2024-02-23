@@ -53,7 +53,6 @@ export const bookGame = (
       }
       dispatch(setBookingStatus(STATE.idle));
     } catch (err) {
-      console.log(err);
       dispatch(setBookingSuccess(""));
       dispatch(setBookingError(err?.response?.data?.error));
       dispatch(setBookingStatus(STATE.failed));

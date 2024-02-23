@@ -1,6 +1,7 @@
 import { FaBars } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  addSnacks,
   getAdminStatus,
   getAllUsers,
   obtainAllUsers,
@@ -19,6 +20,10 @@ const AllUsers = ({ setShowNav }) => {
   useEffect(() => {
     dispatch(obtainAllUsers(currentPage));
   }, [dispatch, currentPage]);
+
+  useEffect(() => {
+    dispatch(addSnacks({ bookingId: "", addSnack: false }));
+  }, [dispatch]);
 
   return (
     <section className="mx-auto w-full max-w-7xl px-4 py-4">
@@ -84,9 +89,9 @@ const AllUsers = ({ setShowNav }) => {
                 <tbody className="divide-y divide-gray-200 bg-white">
                   {adminStatus !== "loading" &&
                     users.length !== 0 &&
-                    users.map((eachUser) => {
+                    users.map((eachUser, index) => {
                       return (
-                        <tr key={eachUser}>
+                        <tr key={index}>
                           <td className="whitespace-nowrap px-4 py-4">
                             <div className="flex items-center">
                               <div className="ml-4">
