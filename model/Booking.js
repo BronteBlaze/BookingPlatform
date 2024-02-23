@@ -31,7 +31,7 @@ const BookingSchema = new Schema(
     bookPrice: {
       type: Number,
       required: true,
-      default: 150,
+      // default: 150,
     },
   },
   { timestamps: true }

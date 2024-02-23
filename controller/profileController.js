@@ -44,9 +44,16 @@ exports.getAllUser = async (req, res, next) => {
     if (user && userRole === "superadmin") {
       const totalUsers = await User.find({}).countDocuments();
       totalPages = Math.ceil(totalUsers / 6);
-      const allUsers = await User.find({})
-        .skip((pageNumber - 1) * 6)
-        .limit(6);
+
+      let allUsers;
+
+      if (pageNumber) {
+        allUsers = await User.find({})
+          .skip((pageNumber - 1) * 6)
+          .limit(6);
+      } else {
+        allUsers = await User.find({});
+      }
 
       let normalUsers = [];
 

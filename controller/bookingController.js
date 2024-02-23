@@ -1,6 +1,7 @@
 const User = require("../model/User");
 const Booking = require("../model/Booking");
 const calculateMiddleTime = require("../Helpers/calculateMiddleTime");
+const Inventory = require("../model/Inventory");
 
 exports.postBookingGame = async (req, res, next) => {
   const { device, duration, dateOfBooking, startTime, endTime } = req.body;
@@ -86,8 +87,12 @@ exports.postBookingGame = async (req, res, next) => {
       }
 
       if (canBook) {
-        const newBooking = new Booking({ ...req.body, userId: user._id });
-
+        const bookPrice = +duration.split(" ")[0] * 150;
+        const newBooking = new Booking({
+          ...req.body,
+          userId: user._id,
+          bookPrice,
+        });
         const success = await newBooking.save();
 
         if (success) {
@@ -96,6 +101,7 @@ exports.postBookingGame = async (req, res, next) => {
             duration,
             startTime,
             endTime,
+            bookPrice,
             dateOfBooking,
           };
           return res
@@ -131,7 +137,7 @@ exports.getAllBookings = async (req, res, next) => {
       if (allBookings) {
         allBookings.forEach((eachBooking) => {
           let {
-            userId: { _id, email, userName },
+            userId: { _id, email, userName, firstName, lastName },
             _id: bookingId,
             device,
             duration,
@@ -142,7 +148,7 @@ exports.getAllBookings = async (req, res, next) => {
           } = eachBooking;
           // console.log(_id);
           bookingInfo.push({
-            user: { userId: _id, email, userName },
+            user: { userId: _id, email, userName, firstName, lastName },
             booking: {
               bookingId,
               device,
@@ -166,4 +172,25 @@ exports.getAllBookings = async (req, res, next) => {
   }
 };
 
-// 10:00AM     1:00PM     => 2024-10-12
+exports.patchSnacks = async (req, res, next) => {
+  const { user, userRole } = req;
+  const { bookingId, snackPrice, inventoryId } = req.body;
+  try {
+    if (user && userRole === "superadmin") {
+      const booking = await Booking.findById(bookingId);
+      const inventory = await Inventory.findById(inventoryId);
+      if (booking && inventory) {
+        booking.bookPrice += snackPrice;
+        inventory.quantity -= 1;
+        const sucessBook = await booking.save();
+        const successInventory = await inventory.save();
+        if (sucessBook && successInventory) {
+          return res.status(200).json({ message: "Added Successfully" });
+        }
+      }
+      throw new Error("Error Occurred");
+    }
+  } catch (err) {
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
