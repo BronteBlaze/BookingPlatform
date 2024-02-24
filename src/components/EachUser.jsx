@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { IoMdNotificationsOutline } from "react-icons/io";
+// import { useEffect, useState } from "react";
+// import { IoMdNotificationsOutline } from "react-icons/io";
 
 const EachUser = ({
   eachUser,
@@ -8,13 +8,13 @@ const EachUser = ({
   userConnectHandler,
   messages,
 }) => {
-  const [notify, setNotify] = useState(false);
+  // const [notify, setNotify] = useState(false);
 
-  useEffect(() => {
-    if (messages.userId === eachUser._id) {
-      setNotify(true);
-    }
-  }, [messages, eachUser]);
+  // useEffect(() => {
+  //   if (messages.userId === eachUser._id) {
+  //     setNotify(true);
+  //   }
+  // }, [messages, eachUser]);
 
   return (
     <div
@@ -25,11 +25,11 @@ const EachUser = ({
     >
       <div className="flex items-center justify-between">
         <span>{fullName}</span>
-        {notify && (
-          <span className="text-2xl">
-            <IoMdNotificationsOutline />
-          </span>
-        )}
+        {/* {notify && ( */}
+        {/* <span className="text-2xl">
+          <IoMdNotificationsOutline />
+        </span> */}
+        {/* )} */}
       </div>
     </div>
   );
